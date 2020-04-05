@@ -1,50 +1,90 @@
-#ifndef PID_H
-#define PID_H
+#ifndef PID_H_
+#define PID_H_
 
-class PID {
- public:
+#include <array>
+#include <numeric>
+
+/*============================================================================*
+ *                             Class Definition                               *
+ *============================================================================*/
+
+class PID
+{
+public:
   /**
    * Constructor
+   * Initialize PID.
+   * @param (Kp, Ki, Kd) The initial PID coefficients
    */
-  PID();
+  PID(double k_p = 0, double k_i = 0, double k_d = 0) : coefficients_{k_p, k_i, k_d} { }
 
   /**
    * Destructor.
    */
-  virtual ~PID();
+  virtual ~PID() { }
 
   /**
-   * Initialize PID.
-   * @param (Kp_, Ki_, Kd_) The initial PID coefficients
+   * Twiddle algorithm step for tuning parameters
+   * @param cte The current cross track error
    */
-  void Init(double Kp_, double Ki_, double Kd_);
+  void TwiddleStep(double cte);
 
+  /**
+   * Compute the control variable given cross track error
+   * @param cte The current cross track error
+   * @return The control variable value
+   */
+  double ComputeControlVariable(double cte);
+
+  /**
+   * Returns the sum of the coefficient increments
+   * @return The sum of the coefficient increments
+   */
+  double GetTwiddleSum()
+  {
+    return std::accumulate(d_coefficients_.begin(), d_coefficients_.end(), 0.0);
+  }
+
+  /**
+   * Returns the Twiddle tolerance
+   * @return The Twiddle tolerance
+   */
+  double GetTwiddleTolerance() { return tol_; }
+
+private:
   /**
    * Update the PID error variables given cross track error.
    * @param cte The current cross track error
    */
-  void UpdateError(double cte);
+  void UpdateError_(double cte);
 
   /**
-   * Calculate the total PID error.
-   * @output The total PID error
+   * PID Coefficients Kp, Ki and Kd
    */
-  double TotalError();
+  std::array<double, 3> coefficients_ = {0.0, 0.0, 0.0};;
 
- private:
   /**
    * PID Errors
    */
-  double p_error;
-  double i_error;
-  double d_error;
+  double cte_ = 0.0;      // error
+  double acc_cte_ = 0.0;  // accumulated error
+  double diff_cte_ = 0.0; // error difference
 
-  /**
-   * PID Coefficients
-   */ 
-  double Kp;
-  double Ki;
-  double Kd;
+  /* Twiddle types and variables */
+  enum TwiddleState
+  {
+    kInitialization = 0,
+    kNewCoefficient,
+    kPostIncrement,
+    kPostDecrement,
+    kStop,
+  };
+
+  double tol_ = 0;
+  std::array<double, 3> d_coefficients_ = {0.0, 0.0, 0.0};
+  TwiddleState state_ = kInitialization;
+  int index_ = 0;
+  double best_cte_ = 0;
 };
 
-#endif  // PID_H
+#endif // PID_H_
