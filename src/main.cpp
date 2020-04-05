@@ -42,7 +42,7 @@ int main()
   /**
    * TODO: Initialize the pid object.
    */
-  PID angle_pid(0.13, 0.00, 1.0);
+  PID angle_pid(0.12, 0.00, 0.99);
 
 #if (TWIDDLE == true)
   PID speed_pid;
