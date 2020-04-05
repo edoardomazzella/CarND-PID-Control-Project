@@ -92,11 +92,6 @@ int main()
            *   Maybe use another PID controller to control the speed!
            */
 #if (TWIDDLE == true)
-          //if(i == 0 || angle_pid.GetTwiddleState() == PID::TwiddleState::kInitialization)
-          //{
-            //angle_pid.TwiddleStep(cte);
-          //}
-
           // Speed PID tuning
           cte_speed_acc += cte_speed;
           if (speed_pid.GetTwiddleState() == PID::TwiddleState::kStop)
