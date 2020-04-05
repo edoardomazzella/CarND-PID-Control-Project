@@ -10,7 +10,7 @@ angle.
 
 [//]: # "Image References"
 
-[image1]: ./images/twiddle.png "Twiddle"
+[image1]: ./twiddle.png "Twiddle"
 
 ## [Rubric](https://review.udacity.com/#!/rubrics/1971/view) Points
 
