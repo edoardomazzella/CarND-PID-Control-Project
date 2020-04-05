@@ -44,7 +44,8 @@ The PID is implemented as described in the lessons and Twiddle algorithm is impl
 
 #### 3. Describe how the final hyperparameters were chosen.
 
-* The final hyperparameters for the speed PID have been tuned through Twiddle.
+* The final hyperparameters for the speed PID have been tuned through Twiddle. After running twiddle for about a half hour I
+  obained the following results on the output console and I used these coefficients for the PID.
   ![alt text][image1]
 * The ones related to the angle have been tuned manually because of the accidents that acted as noises on the input of the 
 controller and did not permit to automatically tune coefficients. I used a trial and error approach, modifying the coefficients
