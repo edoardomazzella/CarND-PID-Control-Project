@@ -24,13 +24,13 @@ angle.
 
 Code must compile without errors with cmake and make.
 
-`CMakeLists.txt` has been modified to properly compile the project.
-
 ### Implementation
 
 #### 1. The PID procedure follows what was taught in the lessons.
 
-The PID is implemented as described in the lessons and Twiddle algorithm is implemented for automatically tuning PID coefficients.
+The PID is implemented as described in the lessons. I also implemented Twiddle algorithm state machine for automatically tuning PID coefficients. 
+The implementation of a single Twiddle step can be found in TwiddleStep() fucntion of PID class and it is called from the
+main once every hundred iterations with the selected PID coefficients. 
 
 ### Reflection
 
