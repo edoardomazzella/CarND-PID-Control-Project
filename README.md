@@ -36,11 +36,11 @@ The PID is implemented as described in the lessons and Twiddle algorithm is impl
 
 #### 1. Describe the effect each of the P, I, D components had in your implementation.
 
-* The P component regulates the control input proportionally to the CTE.
-* The I component regulates the control input proportionally to the accumulation of the error over time. It is useful to 
-  compensate systematic errors.
-* The D component regulates the control input proportionally to the difference of the last two CTE values. It is useful to
-  avoid oscillations.
+* The P component regulates the control input proportionally to the CTE, i.e. the distance from the trajectory.
+* The I component regulates the control input proportionally to the accumulation of the error over time and it is useful to 
+  compensate systematic errors. In our scenario it shall be near to 0 and does not contributes for the control input. 
+* The D component regulates the control input proportionally to the difference of the last two CTE values. It has been 
+  useful to avoid oscillations.
 
 #### 3. Describe how the final hyperparameters were chosen.
 
