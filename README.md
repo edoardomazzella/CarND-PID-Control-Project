@@ -8,6 +8,10 @@ a PID controller in C++ to maneuver the vehicle around the track.
 The simulator will provide you the cross track error (CTE) and the velocity (mph) in order to compute the appropriate steering
 angle.
 
+[//]: # "Image References"
+
+[image1]: ./images/twiddle.png "Twiddle"
+
 ## [Rubric](https://review.udacity.com/#!/rubrics/1971/view) Points
 
 ### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
@@ -41,7 +45,7 @@ The PID is implemented as described in the lessons and Twiddle algorithm is impl
 #### 3. Describe how the final hyperparameters were chosen.
 
 * The final hyperparameters for the speed PID have been tuned through Twiddle.
-
+  ![alt text][image1]
 * The ones related to the angle have been tuned manually because of the accidents that acted as noises on the input of the 
 controller and did not permit to automatically tune coefficients. I used a trial and error approach, modifying the coefficients
 based on what i learned in the lessons.
