@@ -12,7 +12,7 @@ angle.
 
 [image1]: ./twiddle.png "Twiddle"
 
-## [Rubric](https://review.udacity.com/#!/rubrics/1971/view) Points
+## [Rubric](https://review.udacity.com/#!/rubrics/1972/view) Points
 
 ### Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  
 
