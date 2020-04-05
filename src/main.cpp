@@ -5,7 +5,7 @@
 #include "json.hpp"
 #include "PID.h"
 
-#define TWIDDLE     TRUE
+#define TWIDDLE false
 
 // for convenience
 using nlohmann::json;
@@ -42,17 +42,24 @@ int main()
   /**
    * TODO: Initialize the pid object.
    */
-#if (TWIDDLE == TRUE)
   PID angle_pid(0.13, 0.00, 1.0);
+
+#if (TWIDDLE == true)
   PID speed_pid;
+  int i = 0;
+  int n = 100;
+  double cte_acc, cte_speed_acc;
 #else
-  PID angle_pid(0.13, 0.00, 1.0);
-  PID speed_pid(0.1, 0.002, 0.0);
+  PID speed_pid(-0.27, -0.01, -0.48);//(0.1, 0.002, 0.0);
 #endif
 
-  double ref_speed = 10.0;
+  double ref_speed = 30.0;
 
-  h.onMessage([&angle_pid, &speed_pid, ref_speed](uWS::WebSocket<uWS::SERVER> ws,
+  h.onMessage([&angle_pid, &speed_pid,
+              #if (TWIDDLE == true)
+              &i, n, &cte_acc, &cte_speed_acc,
+              #endif
+              ref_speed](uWS::WebSocket<uWS::SERVER> ws,
                      char *data, size_t length, uWS::OpCode opCode) {
     // "42" at the start of the message means there's a websocket message event.
     // The 4 signifies a websocket message
@@ -74,16 +81,9 @@ int main()
           double cte = std::stod(j[1]["cte"].get<string>());
           double speed = std::stod(j[1]["speed"].get<string>());
           double cte_speed = ref_speed - speed;
-          double angle = std::stod(j[1]["steering_angle"].get<string>());
-          double steer_value = 0.0; // for controlling angle
-          double throttle_value = 0.3; // for controlling speed
-
-          // DEBUG
-          //std::cout << "\nCTE: " << cte << std::endl
-          //              << "Angle Value: " << angle << std::endl;
-
-          //std::cout << "\nCTE SPEED: " << cte_speed << std::endl;
-                   //    << "Speed Value: " << speed << std::endl;
+          // double angle = std::stod(j[1]["steering_angle"].get<string>());
+          double steer_value; // for controlling angle
+          double throttle_value; // for controlling speed
 
           /**
            * TODO: Calculate steering value here, remember the steering value is
@@ -91,22 +91,41 @@ int main()
            * NOTE: Feel free to play around with the throttle and speed.
            *   Maybe use another PID controller to control the speed!
            */
-#if (TWIDDLE == TRUE)
-          angle_pid.TwiddleStep(cte);
-
-          //if (speed_pid.GetTwiddleSum() > speed_pid.GetTwiddleTolerance())
+#if (TWIDDLE == true)
+          //if(i == 0 || angle_pid.GetTwiddleState() == PID::TwiddleState::kInitialization)
           //{
-          //  speed_pid.TwiddleStep(cte_speed);
+            //angle_pid.TwiddleStep(cte);
           //}
+
+          // Speed PID tuning
+          cte_speed_acc += cte_speed;
+          if (speed_pid.GetTwiddleState() == PID::TwiddleState::kStop)
+          {
+            /* Intentionally left empty */
+          }
+          else
+          {
+            if(i == 0)
+            {
+              speed_pid.TwiddleStep(cte_speed / n);
+            }
+            i = (i + 1) % n;
+          }
 #endif
           steer_value = angle_pid.ComputeControlVariable(cte);
-          //throttle_value = - speed_pid.ComputeControlVariable(cte_speed);
+          steer_value = (steer_value <= 1.0)? steer_value : 1.0;
+          steer_value = (steer_value >= -1.0)? steer_value : -1.0;
+
+          throttle_value = speed_pid.ComputeControlVariable(cte_speed);
+          throttle_value = (throttle_value <= 1.0)? throttle_value : 1.0;
+          throttle_value = (throttle_value >= 0.0)? throttle_value : 0.0;
 
           json msgJson;
           msgJson["steering_angle"] = steer_value;
           msgJson["throttle"] = throttle_value;
           auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-          std::cout << msgJson.dump() << std::endl;
+          // DEBUG
+          // std::cout << msgJson.dump() << std::endl;
           ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
         } // end "telemetry" if
       }

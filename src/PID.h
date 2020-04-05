@@ -11,6 +11,15 @@
 class PID
 {
 public:
+  enum TwiddleState
+  {
+    kInitialization = 0,
+    kNewCoefficient,
+    kPostIncrement,
+    kPostDecrement,
+    kStop,
+  };
+
   /**
    * Constructor
    * Initialize PID.
@@ -37,19 +46,10 @@ public:
   double ComputeControlVariable(double cte);
 
   /**
-   * Returns the sum of the coefficient increments
-   * @return The sum of the coefficient increments
-   */
-  double GetTwiddleSum()
-  {
-    return std::accumulate(d_coefficients_.begin(), d_coefficients_.end(), 0.0);
-  }
-
-  /**
    * Returns the Twiddle tolerance
    * @return The Twiddle tolerance
    */
-  double GetTwiddleTolerance() { return tol_; }
+  double GetTwiddleState() { return state_; }
 
 private:
   /**
@@ -57,6 +57,15 @@ private:
    * @param cte The current cross track error
    */
   void UpdateError_(double cte);
+
+  /**
+   * Returns the sum of the coefficient increments
+   * @return The sum of the coefficient increments
+   */
+  double GetTwiddleSum_()
+  {
+    return std::accumulate(d_coefficients_.begin(), d_coefficients_.end(), 0.0);
+  }
 
   /**
    * PID Coefficients Kp, Ki and Kd
@@ -70,16 +79,7 @@ private:
   double acc_cte_ = 0.0;  // accumulated error
   double diff_cte_ = 0.0; // error difference
 
-  /* Twiddle types and variables */
-  enum TwiddleState
-  {
-    kInitialization = 0,
-    kNewCoefficient,
-    kPostIncrement,
-    kPostDecrement,
-    kStop,
-  };
-
+  /* Twiddle variables */
   double tol_ = 0;
   std::array<double, 3> d_coefficients_ = {0.0, 0.0, 0.0};
   TwiddleState state_ = kInitialization;
